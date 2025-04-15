@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TranChucThien/argocd-example.git
+    targetRevision: HEAD # branch name or commit hash 
+    path: dev # path to the directory containing the Kubernetes manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: myapp # target namespace in the cluster
+  syncPolicy:
+    automated:
+      prune: true # automatically delete resources that are no longer defined in the source
+      selfHeal: true # automatically sync the application if it drifts from the desired state
+    syncOptions:
+      - CreateNamespace=true # create the namespace if it doesn't exist
+      - PruneLast=true # prune resources after syncing
+    
