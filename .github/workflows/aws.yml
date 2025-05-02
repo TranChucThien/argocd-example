@@ -38,10 +38,27 @@ jobs:
         EOF
       env:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
+        
+  training_with_dataset:
+    if: ${{ github.event.inputs.run_option == 'all' }}
+    needs: dataset_preparation
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.EMR_KEY }}" > emr.pem
+        chmod 600 emr.pem
+
+    - name: SSH to EC2 and run training
+      run: |
+        ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com << 'EOF'
+          cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
+          python3 src/_02_training.py 
+        EOF
+
 
   training:
-    needs: dataset_preparation
-    if: ${{ github.event.inputs.run_option == 'all' || github.event.inputs.run_option == 'train' }}
+    if: ${{ github.event.inputs.run_option == 'train' }}
     runs-on: ubuntu-latest
     steps:
     - name: Set up SSH key
