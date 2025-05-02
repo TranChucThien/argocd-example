@@ -24,6 +24,6 @@ jobs:
     - name: SSH to EC2 instance
       run: |
         # Kết nối tới EC2 instance bằng SSH và thực hiện lệnh (ví dụ: kiểm tra phiên bản)
-        ssh -i "emr.pem" -o StrictHostKeyChecking=no root@ec2-54-92-167-250.compute-1.amazonaws.com 'echo "Connected successfully!"'
+        ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com 'echo "Connected successfully!"'
       env:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
