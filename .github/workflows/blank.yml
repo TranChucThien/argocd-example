@@ -20,6 +20,7 @@ jobs:
 
   # Job 2: Chạy song song với Job 3 và lưu kết quả dưới dạng artifact
   job2:
+    needs: [job1]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,13 +32,14 @@ jobs:
           echo "Task 2 is completed"
           echo "Task 2 result" > result_task2.txt  # Ghi kết quả vào file
       - name: Upload Task 2 result as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: result_task2
           path: result_task2.txt
 
   # Job 3: Chạy song song với Job 2 và lưu kết quả dưới dạng artifact
   job3:
+    needs: [job1]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -49,7 +51,7 @@ jobs:
           echo "Task 3 is completed"
           echo "Task 3 result" > result_task3.txt  # Ghi kết quả vào file
       - name: Upload Task 3 result as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: result_task3
           path: result_task3.txt
@@ -62,11 +64,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Download artifacts from Job 2 and Job 3
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: result_task2
       - name: Download Task 3 result artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: result_task3
       - name: Aggregate Results from Job 2 and Job 3
