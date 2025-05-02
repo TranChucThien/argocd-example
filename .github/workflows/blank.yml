@@ -1,13 +1,21 @@
 name: Run Jobs in Parallel and Aggregate Results
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      run_option:
+        description: 'Chọn chế độ chạy: one (chỉ chạy job1) hoặc all (chạy toàn bộ pipeline)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - one
 
 jobs:
-  # Job 1: Chạy song song với Job 2 và Job 3
+  # Job 1: Luôn chạy nếu chọn all hoặc one
   job1:
+    if: ${{ github.event.inputs.run_option == 'all' || github.event.inputs.run_option == 'one' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,8 +26,9 @@ jobs:
           sleep 2
           echo "Job 1 is completed"
 
-  # Job 2: Chạy song song với Job 3 và lưu kết quả dưới dạng artifact
+  # Job 2: Chạy song song với Job 3, nếu chọn chế độ all
   job2:
+    if: ${{ github.event.inputs.run_option == 'all' }}
     needs: [job1]
     runs-on: ubuntu-latest
     steps:
@@ -30,15 +39,16 @@ jobs:
           echo "Task 2 is running"
           sleep 3
           echo "Task 2 is completed"
-          echo "Task 2 result" > result_task2.txt  # Ghi kết quả vào file
+          echo "Task 2 result" > result_task2.txt
       - name: Upload Task 2 result as artifact
         uses: actions/upload-artifact@v4
         with:
           name: result_task2
           path: result_task2.txt
 
-  # Job 3: Chạy song song với Job 2 và lưu kết quả dưới dạng artifact
+  # Job 3: Chạy song song với Job 2, nếu chọn chế độ all
   job3:
+    if: ${{ github.event.inputs.run_option == 'all' }}
     needs: [job1]
     runs-on: ubuntu-latest
     steps:
@@ -49,21 +59,22 @@ jobs:
           echo "Task 3 is running"
           sleep 4
           echo "Task 3 is completed"
-          echo "Task 3 result" > result_task3.txt  # Ghi kết quả vào file
+          echo "Task 3 result" > result_task3.txt
       - name: Upload Task 3 result as artifact
         uses: actions/upload-artifact@v4
         with:
           name: result_task3
           path: result_task3.txt
 
-  # Job 4: Tổng hợp kết quả từ Job 2 và Job 3
+  # Job 4: Tổng hợp kết quả từ Job 2 và Job 3, chỉ chạy nếu chọn all
   job4:
-    needs: [job2, job3]  # Job 4 chỉ chạy sau khi Job 2 và Job 3 hoàn thành
+    if: ${{ github.event.inputs.run_option == 'all' }}
+    needs: [job2, job3]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Download artifacts from Job 2 and Job 3
+      - name: Download artifacts from Job 2
         uses: actions/download-artifact@v4
         with:
           name: result_task2
@@ -74,7 +85,6 @@ jobs:
       - name: Aggregate Results from Job 2 and Job 3
         run: |
           echo "Job 4 is running"
-          # Lấy kết quả từ các file đã được tải xuống
           cat result_task2.txt
           cat result_task3.txt
           echo "Job 4 is completed and results are aggregated"
