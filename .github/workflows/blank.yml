@@ -1,23 +1,24 @@
-name: Run Jobs in Parallel
+name: Run Jobs in Parallel and Aggregate Results
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch: 
 
 jobs:
+  # Job 1: Chạy song song với Job 2 và Job 3
   job1:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Run Task 1
+      - name: Run Task in Job 1
         run: |
-          echo "Task 1 is running"
-          sleep 5
-          echo "Task 1 is completed"
+          echo "Job 1 is running"
+          sleep 2
+          echo "Job 1 is completed"
 
+  # Job 2: Chạy song song với Job 3
   job2:
     runs-on: ubuntu-latest
     steps:
@@ -28,3 +29,32 @@ jobs:
           echo "Task 2 is running"
           sleep 3
           echo "Task 2 is completed"
+          echo "Task 2 result" > result_task2.txt  # Ghi kết quả vào file
+
+  # Job 3: Chạy song song với Job 2
+  job3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Task 3
+        run: |
+          echo "Task 3 is running"
+          sleep 4
+          echo "Task 3 is completed"
+          echo "Task 3 result" > result_task3.txt  # Ghi kết quả vào file
+
+  # Job 4: Tổng hợp kết quả từ Job 2 và Job 3
+  job4:
+    needs: [job2, job3]  # Job 4 chỉ chạy sau khi Job 2 và Job 3 hoàn thành
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Aggregate Results from Job 2 and Job 3
+        run: |
+          echo "Job 4 is running"
+          # Lấy kết quả từ Job 2 và Job 3
+          cat result_task2.txt
+          cat result_task3.txt
+          echo "Job 4 is completed and results are aggregated"
