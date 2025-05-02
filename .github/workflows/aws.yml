@@ -19,15 +19,21 @@ jobs:
         echo "${{ secrets.EMR_KEY }}" > emr.pem
         chmod 600 emr.pem
         ls
-      
 
-    - name: SSH to EC2 instance
+    - name: Add EC2 instance to known hosts
       run: |
-        # Kết nối tới EC2 instance bằng SSH và thực hiện lệnh (ví dụ: kiểm tra phiên bản)
-        ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com 'echo "Connected successfully!"'
-        ls
-        whoami
-        cd /home/ubuntu/kltn-sentiment-monitoring-mlops
-        python3 main.py all
+        # Thêm EC2 instance vào danh sách known hosts để tránh cảnh báo SSH
+        ssh-keyscan -H ec2-54-92-167-250.compute-1.amazonaws.com >> ~/.ssh/known_hosts
+
+    - name: SSH to EC2 instance and run commands
+      run: |
+        # Kết nối tới EC2 instance bằng SSH và chạy các lệnh sau khi kết nối thành công
+        ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com << 'EOF'
+          echo "Connected successfully!"
+          ls
+          whoami
+          cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
+          python3 main.py all
+        EOF
       env:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
