@@ -40,7 +40,7 @@ jobs:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
         
   training:
-    if: ${{ github.event.inputs.run_option == 'all' }}
+    if: ${{ github.event.inputs.run_option == 'all' || github.event.inputs.run_option == 'train_eval' }}
     # if: ${{ github.event.inputs.run_option == 'all' || github.event.inputs.run_option == 'train' }}
     needs: dataset_preparation
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
       run: |
         ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com << 'EOF'
           cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
-          python3 src/_03_evaluate.py 
+          python3 main.py eval
         EOF
 
   
@@ -96,8 +96,26 @@ jobs:
           ls
           whoami
           cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
-          python3 src/_02_training.py 
+          python3 main.py train
         EOF
       env:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
+        
+  evaluate_standalone:
+    if: ${{ github.event.inputs.run_option == 'eval' }}
+    needs: training
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up SSH key
+      run: |
+        echo "${{ secrets.EMR_KEY }}" > emr.pem
+        chmod 600 emr.pem
+
+    - name: SSH to EC2 and run training
+      run: |
+        ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com << 'EOF'
+          cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
+          python3 main.py eval
+        EOF
+
         
