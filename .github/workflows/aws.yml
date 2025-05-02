@@ -58,7 +58,7 @@ jobs:
         EOF
         
   evaluate:
-    if: ${{ github.event.inputs.run_option == 'all' }}
+    if: ${{ github.event.inputs.run_option == 'all' ||   github.event.inputs.run_option == 'train_eval'}}
     needs: training
     runs-on: ubuntu-latest
     steps:
