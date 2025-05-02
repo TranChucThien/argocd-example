@@ -25,7 +25,7 @@ jobs:
       run: |
         # Kết nối tới EC2 instance bằng SSH và thực hiện lệnh (ví dụ: kiểm tra phiên bản)
         ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com 'echo "Connected successfully!"'
-        cd cd kltn-sentiment-monitoring-mlops/
+        cd kltn-sentiment-monitoring-mlops/
         python3 main.py all
       env:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
