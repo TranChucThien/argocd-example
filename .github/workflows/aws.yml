@@ -20,10 +20,7 @@ jobs:
         chmod 600 emr.pem
         ls
 
-    - name: Add EC2 instance to known hosts
-      run: |
-        # Thêm EC2 instance vào danh sách known hosts để tránh cảnh báo SSH
-        ssh-keyscan -H ec2-54-92-167-250.compute-1.amazonaws.com >> ~/.ssh/known_hosts
+
 
     - name: SSH to EC2 instance and run commands
       run: |
