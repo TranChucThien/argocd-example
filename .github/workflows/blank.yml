@@ -1,0 +1,30 @@
+name: Run Jobs in Parallel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: 
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Task 1
+        run: |
+          echo "Task 1 is running"
+          sleep 5
+          echo "Task 1 is completed"
+
+  job2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Task 2
+        run: |
+          echo "Task 2 is running"
+          sleep 3
+          echo "Task 2 is completed"
