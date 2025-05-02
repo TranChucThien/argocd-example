@@ -57,7 +57,7 @@ jobs:
         EOF
 
 
-  training:
+  training_standalone:
     if: ${{ github.event.inputs.run_option == 'train' }}
     runs-on: ubuntu-latest
     steps:
