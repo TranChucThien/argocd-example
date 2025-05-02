@@ -18,7 +18,7 @@ jobs:
           sleep 2
           echo "Job 1 is completed"
 
-  # Job 2: Chạy song song với Job 3
+  # Job 2: Chạy song song với Job 3 và lưu kết quả dưới dạng artifact
   job2:
     runs-on: ubuntu-latest
     steps:
@@ -30,8 +30,13 @@ jobs:
           sleep 3
           echo "Task 2 is completed"
           echo "Task 2 result" > result_task2.txt  # Ghi kết quả vào file
+      - name: Upload Task 2 result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: result_task2
+          path: result_task2.txt
 
-  # Job 3: Chạy song song với Job 2
+  # Job 3: Chạy song song với Job 2 và lưu kết quả dưới dạng artifact
   job3:
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +48,11 @@ jobs:
           sleep 4
           echo "Task 3 is completed"
           echo "Task 3 result" > result_task3.txt  # Ghi kết quả vào file
+      - name: Upload Task 3 result as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: result_task3
+          path: result_task3.txt
 
   # Job 4: Tổng hợp kết quả từ Job 2 và Job 3
   job4:
@@ -51,10 +61,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Download artifacts from Job 2 and Job 3
+        uses: actions/download-artifact@v3
+        with:
+          name: result_task2
+      - name: Download Task 3 result artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: result_task3
       - name: Aggregate Results from Job 2 and Job 3
         run: |
           echo "Job 4 is running"
-          # Lấy kết quả từ Job 2 và Job 3
+          # Lấy kết quả từ các file đã được tải xuống
           cat result_task2.txt
           cat result_task3.txt
           echo "Job 4 is completed and results are aggregated"
