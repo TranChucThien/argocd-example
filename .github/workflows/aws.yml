@@ -1,27 +1,31 @@
 name: SSH to Server with Secret Key
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      run_option:
+        description: 'Chọn chế độ: all (chạy toàn bộ pipeline)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - dataset
+          - train
+          - eval
 
 jobs:
-  deploy:
+  dataset_preparation:
+    if: ${{ github.event.inputs.run_option == 'all' || github.event.inputs.run_option == 'dataset' }}
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
     - name: Set up SSH key
       run: |
         # Tạo file chứa GitHub secret và set quyền truy cập
         echo "${{ secrets.EMR_KEY }}" > emr.pem
         chmod 600 emr.pem
         ls
-
-
-
+        
     - name: SSH to EC2 instance and run commands
       run: |
         # Kết nối tới EC2 instance bằng SSH và chạy các lệnh sau khi kết nối thành công
@@ -30,7 +34,33 @@ jobs:
           ls
           whoami
           cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
-          python3 main.py all
+          python3 src/src/_01_dataset_preparation.py
         EOF
       env:
         PRIVATE_KEY: ${{ secrets.EMR_KEY }}
+
+  training:
+    needs: dataset_preparation
+    if: ${{ github.event.inputs.run_option == 'all' || github.event.inputs.run_option == 'train' }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up SSH key
+      run: |
+        # Tạo file chứa GitHub secret và set quyền truy cập
+        echo "${{ secrets.EMR_KEY }}" > emr.pem
+        chmod 600 emr.pem
+        ls
+        
+    - name: SSH to EC2 instance and run commands
+      run: |
+        # Kết nối tới EC2 instance bằng SSH và chạy các lệnh sau khi kết nối thành công
+        ssh -i "emr.pem" -o StrictHostKeyChecking=no ubuntu@ec2-54-92-167-250.compute-1.amazonaws.com << 'EOF'
+          echo "Connected successfully!"
+          ls
+          whoami
+          cd /home/ubuntu/kltn-sentiment-monitoring-mlops || exit
+          python3 src/_02_training.py 
+        EOF
+      env:
+        PRIVATE_KEY: ${{ secrets.EMR_KEY }}
+        
