@@ -1,0 +1,32 @@
+name: SSH to Server with Secret Key
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up SSH key
+      run: |
+        # Tạo file chứa GitHub secret và set quyền truy cập
+        echo "${{ secrets.EMR_KEY }}" > emr.pem
+        chmod 600 emr.pem
+        
+    - name: Add EC2 instance to known hosts
+      run: |
+        # Thêm EC2 instance vào danh sách known hosts để tránh cảnh báo SSH
+        ssh-keyscan -H ec2-54-92-167-250.compute-1.amazonaws.com >> ~/.ssh/known_hosts
+
+    - name: SSH to EC2 instance
+      run: |
+        # Kết nối tới EC2 instance bằng SSH và thực hiện lệnh (ví dụ: kiểm tra phiên bản)
+        ssh -i "emr.pem" -o StrictHostKeyChecking=no root@ec2-54-92-167-250.compute-1.amazonaws.com 'echo "Connected successfully!"'
+      env:
+        PRIVATE_KEY: ${{ secrets.EMR_KEY }}
