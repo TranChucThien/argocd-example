@@ -33,31 +33,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Skip
+      if: github.event.inputs.job_to_run != 'job_one' && github.event.inputs.job_to_run != 'all'
       run: exit 1
-      if: github.event.inputs.job_to_run != 'job_one' || github.event.inputs.job_to_run != 'all'
     - name: Echo One
-      run: echo "Job One running in ${{ github.event.inputs.environment }} in region ${{ github.event.inputs.region }}"
-    
+      run: echo "Job One running"
 
   job_two:
     runs-on: ubuntu-latest
     needs: job_one
     steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_two' && github.event.inputs.job_to_run != 'all'
+      run: exit 1
     - name: Echo Two
       run: echo "Job Two running after Job One"
 
   job_three:
-    if: github.event.inputs.job_to_run == '' || github.event.inputs.job_to_run == 'job_three' || github.event.inputs.job_to_run == 'job_one'
     runs-on: ubuntu-latest
     needs: job_one
     steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_three' && github.event.inputs.job_to_run != 'all'
+      run: exit 1
     - name: Echo Three
       run: echo "Job Three also running after Job One"
 
   job_four:
-    if: github.event.inputs.job_to_run == '' || github.event.inputs.job_to_run == 'job_four' || github.event.inputs.job_to_run == 'job_two' || github.event.inputs.job_to_run == 'job_three'
     runs-on: ubuntu-latest
     needs: [job_two, job_three]
     steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_four' && github.event.inputs.job_to_run != 'all'
+      run: exit 1
     - name: Echo Four
       run: echo "Job Four running after Job Two and Job Three are complete"
