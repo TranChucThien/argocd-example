@@ -34,7 +34,7 @@ jobs:
     steps:
     - name: Skip
       if: github.event.inputs.job_to_run != 'job_one' && github.event.inputs.job_to_run != 'all'
-      run: exit 1
+      run: exit 
     - name: Echo One
       run: echo "Job One running"
 
@@ -44,7 +44,7 @@ jobs:
     steps:
     - name: Skip
       if: github.event.inputs.job_to_run != 'job_two' && github.event.inputs.job_to_run != 'all'
-      run: exit 1
+      run: exit
     - name: Echo Two
       run: echo "Job Two running after Job One"
 
@@ -54,7 +54,7 @@ jobs:
     steps:
     - name: Skip
       if: github.event.inputs.job_to_run != 'job_three' && github.event.inputs.job_to_run != 'all'
-      run: exit 1
+      run: exit 
     - name: Echo Three
       run: echo "Job Three also running after Job One"
 
@@ -64,6 +64,6 @@ jobs:
     steps:
     - name: Skip
       if: github.event.inputs.job_to_run != 'job_four' && github.event.inputs.job_to_run != 'all'
-      run: exit 1
+      run: exit 
     - name: Echo Four
       run: echo "Job Four running after Job Two and Job Three are complete"
