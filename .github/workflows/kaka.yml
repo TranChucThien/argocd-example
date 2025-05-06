@@ -1,0 +1,46 @@
+name: Demo Workflow Dispatch with Four Ubuntu Jobs
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      region:
+        description: 'Select the deployment region'
+        required: false
+        type: string
+        default: 'us-east-1'
+
+jobs:
+  job_one:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Echo One
+      run: echo "Job One running in ${{ github.event.inputs.environment }} in region ${{ github.event.inputs.region }}"
+
+  job_two:
+    runs-on: ubuntu-latest
+    needs: job_one
+    steps:
+    - name: Echo Two
+      run: echo "Job Two running after Job One"
+
+  job_three:
+    runs-on: ubuntu-latest
+    needs: job_one
+    steps:
+    - name: Echo Three
+      run: echo "Job Three also running after Job One"
+
+  job_four:
+    runs-on: ubuntu-latest
+    needs: [job_two, job_three]
+    steps:
+    - name: Echo Four
+      run: echo "Job Four running after Job Two and Job Three are complete"
