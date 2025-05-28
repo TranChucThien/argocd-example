@@ -1,0 +1,27 @@
+name: Echo Something Example
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows you to manually trigger the workflow
+  schedule:
+    # Run every day at 08:00 UTC
+    # (which is 3:00 PM HCMC time, given HCMC is UTC+7)
+    - cron: '*/10 * * * *'
+
+jobs:
+  echo-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Echo a simple message
+        run: echo "Hello, GitHub Actions!"
+
+
+
+      - name: Echo multiple lines
+        run: |
+          echo "This is the first line."
+          echo "This is the second line of output."
+          echo "And a third one, for good measure!"
