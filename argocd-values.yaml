@@ -1,0 +1,7 @@
+server:
+  ingress:
+    enabled: true
+    hostname: argocd.chucthien.id.vn
+    ingressClassName: nginx
+  extraArgs:
+  - --insecure
