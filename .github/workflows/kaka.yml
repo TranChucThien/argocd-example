@@ -1,0 +1,69 @@
+name: Demo Workflow Dispatch with Selective Job and Dependencies
+
+on:
+  workflow_dispatch:
+    inputs:
+      # environment:
+      #   description: 'Select the environment to deploy to'
+      #   required: true
+      #   default: 'staging'
+      #   type: choice
+      #   options:
+      #   - staging
+      #   - production
+      # region:
+      #   description: 'Select the deployment region'
+      #   required: false
+      #   type: string
+      #   default: 'us-east-1'
+      job_to_run:
+        description: 'Select the specific job to run (and its dependencies, leave empty to run all)'
+        required: true
+        type: choice
+        default: all
+        options:
+        - job_one
+        - job_two
+        - job_three
+        - job_four
+        - all
+
+jobs:
+  job_one:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_one' && github.event.inputs.job_to_run != 'all'
+      run: exit 
+    - name: Echo One
+      run: echo "Job One running"
+
+  job_two:
+    runs-on: ubuntu-latest
+    needs: job_one
+    steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_two' && github.event.inputs.job_to_run != 'all'
+      run: exit
+    - name: Echo Two
+      run: echo "Job Two running after Job One"
+
+  job_three:
+    runs-on: ubuntu-latest
+    needs: job_one
+    steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_three' && github.event.inputs.job_to_run != 'all'
+      run: exit 
+    - name: Echo Three
+      run: echo "Job Three also running after Job One"
+
+  job_four:
+    runs-on: ubuntu-latest
+    needs: [job_two, job_three]
+    steps:
+    - name: Skip
+      if: github.event.inputs.job_to_run != 'job_four' && github.event.inputs.job_to_run != 'all'
+      run: exit 
+    - name: Echo Four
+      run: echo "Job Four running after Job Two and Job Three are complete"
