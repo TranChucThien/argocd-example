@@ -4,7 +4,7 @@ metadata:
   name: my-flask-app
   namespace: myapp
 spec:
-  replicas: 6
+  replicas: 2
   selector:
     matchLabels:
       app: my-flask-app
@@ -21,3 +21,4 @@ spec:
           ports:
             - containerPort: 5000
           imagePullPolicy: Always
+
