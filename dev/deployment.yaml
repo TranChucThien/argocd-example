@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-flask-app
-  namespace: myapp
+  # namespace: myapp
 spec:
   replicas: 2
   selector:
@@ -21,5 +21,6 @@ spec:
           ports:
             - containerPort: 5000
           imagePullPolicy: Always
+
 
 
