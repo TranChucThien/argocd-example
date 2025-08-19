@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-flask-app
-  namespace: myapp
 spec:
   replicas: 2
   selector:
@@ -17,8 +16,10 @@ spec:
         - name: regcred
       containers:
         - name: my-flask-container
-          image: public.ecr.aws/f7b0e1m6/chucthien:op
+          image:  chucthien03/resource-monitoring-app:blue
           ports:
             - containerPort: 5000
           imagePullPolicy: Always
+
+
 
