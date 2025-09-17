@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter-crd
+  namespace: kube-system
+spec:
+  project: karpenter
+  source:
+    repoURL: oci://public.ecr.aws/karpenter/karpenter-crd   # repo Helm OCI
+    chart: karpenter-crd                                    # tên chart
+    targetRevision: 1.6.0                                 # version
+    helm:
+      valueFiles:
+        - values.yaml                                       # file values của bạn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated: {}

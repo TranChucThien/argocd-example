@@ -1,0 +1,17 @@
+# values.yaml
+settings:
+  clusterName: cluster-argocd-mdass
+  interruptionQueue: cluster-argocd-mdass
+
+controller:
+  resources:
+    requests:
+      cpu: "1"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123831926968:role/KarpenterControllerRole
