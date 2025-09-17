@@ -14,4 +14,4 @@ controller:
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::123831926968:role/KarpenterControllerRole
+    eks.amazonaws.com/role-arn: arn:aws:iam::xxxxxx:role/KarpenterControllerRole

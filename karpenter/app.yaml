@@ -1,19 +1,36 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: karpenter-crd
-  namespace: kube-system
+  name: karpenter
+     # nên để ở argocd
 spec:
-  project: karpenter
+  project: default
   source:
-    repoURL: oci://public.ecr.aws/karpenter/karpenter-crd   # repo Helm OCI
-    chart: karpenter-crd                                    # tên chart
-    targetRevision: 1.6.0                                 # version
+    repoURL: oci://public.ecr.aws/karpenter/karpenter
+    chart: karpenter
+    targetRevision: 1.6.0
     helm:
-      valueFiles:
-        - values.yaml                                       # file values của bạn
+      valuesObject:
+        settings:
+          clusterName: cluster-argocd-mdass
+          interruptionQueue: cluster-argocd-mdass
+
+        controller:
+          resources:
+            requests:
+              cpu: "1"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+
+        serviceAccount:
+          annotations:
+            eks.amazonaws.com/role-arn: arn:aws:iam::123831926968:role/KarpenterControllerRole
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
   syncPolicy:
-    automated: {}
+    automated:
+      prune: true
+      selfHeal: true
